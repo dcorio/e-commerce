@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="cart_lines_qty_precision" inherit_id="website_sale.cart_lines" name="Shopping Cart Lines Qty Precision">
+		<xpath expr="//input[@t-att-value='int(line.product_uom_qty)']" position="attributes">
+		 	<attribute name="t-att-value">line.product_uom_qty</attribute>
+		</xpath>
+	</template>
+
+	<template id="cart_popover_qty_precision" inherit_id='website_sale.cart_popover' name="Cart Popover Qty Precision">
+        <xpath expr="//small" position="replace">
+        	<small>Qty: <t t-esc="line.product_uom_qty" /></small>
+        </xpath>
+    </template>
+
+</odoo>

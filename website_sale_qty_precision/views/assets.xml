@@ -2,7 +2,8 @@
 <odoo>
     <template id="assets_frontend_qty_precision" inherit_id="website.assets_frontend" name="Shop Qty Precision">
         <xpath expr="." position="inside">
-            <script type="text/javascript" src="/website_sale_qty_precision/static/src/js/website_sale_qty_precision.js"></script>
+			<link rel="stylesheet" href="/website_sale_qty_precision/static/src/css/website_sale_qty_precision.css" />            
+			<script type="text/javascript" src="/website_sale_qty_precision/static/src/js/website_sale_qty_precision.js"></script>
         </xpath>
     </template>
 </odoo>

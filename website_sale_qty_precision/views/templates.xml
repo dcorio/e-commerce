@@ -13,4 +13,11 @@
         </xpath>
     </template>
 
+    <template id="product_quantity_precision" inherit_id="website_sale.product_quantity"
+  		name="Select Quantity Precision">
+      <xpath expr="//input[@data-min='1']" position="attributes">
+      	<attribute name="data-min">0.1</attribute>
+      </xpath>
+    </template>
+
 </odoo>

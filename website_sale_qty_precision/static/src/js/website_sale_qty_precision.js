@@ -1,6 +1,5 @@
 odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (require) {
     "use strict";
-
     var base = require('web_editor.base');
     var ajax = require('web.ajax');
     var utils = require('web.utils');
@@ -13,6 +12,14 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
 
     $('.oe_website_sale').each(function () {
         var oe_website_sale = this;
+
+        var clickwatch = (function(){
+              var timer = 0;
+              return function(callback, ms){
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+              };
+        })();
 
         $(oe_website_sale).off("change", 'input[name="add_qty"]');
         $(oe_website_sale).on("change", 'input[name="add_qty"]', function (event) {
@@ -27,7 +34,7 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
 
             if ($("#product_detail").length) {
                 // display the reduction from the pricelist in function of the quantity
-                ajax.jsonRpc("/shop/get_unit_price", 'call', {'product_ids': product_ids,'add_qty': parseFloat(qty)})
+                ajax.jsonRpc("/shop/get_unit_price", 'call', {'product_ids': product_ids,'add_qty': parseFloat(qty).toFixed(2)})
                 .then(function (data) {
                     var current = product_dom.data("attribute_value_ids");
                     for(var j=0; j < current.length; j++){
@@ -44,11 +51,11 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
             if ($input.data('update_change')) {
                 return;
             }
-          var value = parseFloat($input.val() || 0, 10);
+          var value = parseFloat($input.val() || 0, 10).toFixed(2);
           var $dom = $(this).closest('tr');
           var $dom_optional = $dom.nextUntil(':not(.optional_product.info)');
-          var line_id = parseFloat($input.data('line-id'),10);
-          var product_ids = [parseFloat($input.data('product-id'),10)];
+          var line_id = parseInt($input.data('line-id'),10);
+          var product_ids = [parseInt($input.data('product-id'),10)];
           clickwatch(function(){
             $dom_optional.each(function(){
                 $(this).find('.js_quantity').text(value);
@@ -62,7 +69,7 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
                 'set_qty': value
             }).then(function (data) {
                 $input.data('update_change', false);
-                if (value !== parseFloat($input.val() || 0, 10)) {
+                if (value !== parseFloat($input.val() || 0, 10).toFixed(2)) {
                     $input.trigger('change');
                     return;
                 }
@@ -102,9 +109,9 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
             var $link = $(ev.currentTarget);
             var $input = $link.parent().find("input");
             var product_id = +$input.closest('*:has(input[name="product_id"])').find('input[name="product_id"]').val();
-            var min = parseFloat($input.data("min") || 0);
+            var min = parseFloat($input.data("min") || 0.1);
             var max = parseFloat($input.data("max") || Infinity);
-            var quantity = ($link.has(".fa-minus").length ? -0.1 : 0.1) + parseFloat($input.val() || 0, 10);
+            var quantity = parseFloat(($link.has(".fa-minus").length ? -0.1 : 0.1) + parseFloat($input.val() || 0, 10)).toFixed(2)
             $('input[name="'+$input.attr("name")+'"]').add($input).filter(function () {
                 var $prod = $(this).closest('*:has(input[name="product_id"])');
                 return !$prod.length || +$prod.find('input[name="product_id"]').val() === product_id;
@@ -124,6 +131,12 @@ odoo.define('website_sale_qty_precision.website_sale_qty_precision', function (r
 
             var dec = value % 1;
             $price.html(value + (dec < 0.01 ? ".00" : (dec < 1 ? "0" : "") ));
+        });
+
+        $('.oe_cart').off('click', '.js_delete_product');
+        $('.oe_cart').on('click', '.js_delete_product', function(e) {
+            e.preventDefault();
+            $(this).closest('tr').find('.js_quantity').val(0).trigger('change');
         });
         
     });
